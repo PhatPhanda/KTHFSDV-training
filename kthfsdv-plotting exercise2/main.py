@@ -63,7 +63,7 @@ class DynamicPlotter(Plotter):
 
     def on_reset(self, event):
         self.animation.event_source.stop()
-        self_paused = True
+        self.paused = True
         self.pause_button.label.set_text("Start")
 
         self.line.set_data([],[])
@@ -71,8 +71,6 @@ class DynamicPlotter(Plotter):
         self.animation.frame_seq = self.animation.new_frame_seq()
 
         self.fig.canvas.draw_idle()
-
-
 
 
     def update(self, frame):
@@ -83,6 +81,12 @@ class DynamicPlotter(Plotter):
 
         self.ax.relim()
         self.ax.autoscale_view()
+
+        if frame == self.num_points - 1:
+            self.animation.event_source.stop()
+            self.paused = True
+            self.pause_button.label.set_text("Start")
+
 
         return self.line
 
@@ -96,6 +100,34 @@ class DynamicPlotter(Plotter):
 
         plt.show()
 
-    
-plotter = DynamicPlotter(0, 2, 500)
-plotter.plot()
+
+def main():
+    print("=== Plotter ===")
+    print("Choose plot type:")
+    print("s - Static plot")
+    print("d - Dynamic plot")
+
+    while True:
+        plot_type = input("Enter s or d: ").lower()
+
+        if plot_type == "s" or plot_type == "d":
+            break
+
+        print("Please enter either 's' or 'd'.")
+
+    start_t = float(input("Enter starting t: "))
+    end_t = float(input("Enter ending t: "))
+    num_points = int(input("Enter number of points: ")) 
+
+    if plot_type == "s":
+        plotter = StaticPlotter(start_t, end_t, num_points)
+        plotter.plot()
+
+    else:
+        plotter = DynamicPlotter(start_t, end_t, num_points)
+        plotter.plot()
+
+
+if __name__ == "__main__":
+    main()
+
